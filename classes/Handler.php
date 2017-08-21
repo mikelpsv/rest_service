@@ -12,14 +12,16 @@
  * @author lapshov
  */
 class Handler {
+    private $db;
     private $path;
     private $rawData;
     
     public function __construct() {
-       
+        global $db_config;
+        $this->db = Service::getDb($db_config);
     }
 
-        /**
+     /**
      * Устанавливает массив сегментов пути для дальнейшего использования в обработчиках
      * @param type $path
      */
@@ -57,28 +59,42 @@ class Handler {
      * @param type $sql
      * @return type
      */
-    static function getDataJSON($sql) {
-        Service::log(0, $sql);
-        $query = mysql_query($sql);
+    public static function getDataJSON($sql) {
+        global $db_config;
+        
+        Service::log(Service::LOG_LEVEL_DEBUG, $sql);
+        
+        $db = Service::getDb($db_config);
+        $res = $db->query($sql);
         $result = array();
 
-        while ($row = mysql_fetch_array($query, MYSQL_ASSOC)) {
+        while ($row = $res->fetch_array(MYSQL_ASSOC)) {
             $result[] = $row;
         }
 
-        mysql_free_result($query);
-
-        $response = (count($result) > 0);
-        $message = ((count($result) > 0) ? "" : "No data");
-
-        $resp = array(
-            'response'  => $response,
-            'message'   => $message,
-            'data'      => $result
-        );
-
-        return json_encode($resp);
+        return self::createResponse($result);
     }
+    
+    /**
+     * Формирует структурированное сообщение ответа
+     * @param type $data
+     * @param type $message
+     * @return type
+     */
+    public static function createResponse($data, $message = null){
+        if($message == null){
+            $message = ((count($data) > 0) ? "" : "No data");
+        }
+        
+        $resp = array(
+            'response'  => (count($data) > 0),
+            'message'   => $message,
+            'data'      => $data
+        );
+        
+        return self::jdecoder(json_encode($resp));          
+        
+    }    
     
     static function jdecoder($json_str){
         $cyr_chars = array (
@@ -131,4 +147,6 @@ class Handler {
 
     }    
 
+
+    
 }

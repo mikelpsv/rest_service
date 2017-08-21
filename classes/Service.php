@@ -1,6 +1,11 @@
 <?php
 
 class Service {
+    const LOG_LEVEL_INFO    = 1;
+    const LOG_LEVEL_WARNING = 2;
+    const LOG_LEVEL_DEBUG   = 9;
+
+    private static $db_instance;
 
     private $db;
     private $uri;
@@ -17,25 +22,27 @@ class Service {
     public function __construct($db_config, &$router, $base_uri = '') {
         $this->system_key_id = 0;
 
+        $this->db = self::getDb($db_config);
         $this->router = $router;
         $this->router->addParam($this->get_uri_path());
-
-
-        $this->db = new Database($db_config);
-
-        if (!$this->db->init()) {
-            throw new Exception($this->db->get_error());
-        }
+        
     }
 
-    /**
+    public static function getDb($db_config){
+        if(self::$db_instance == null){
+             self::$db_instance = new mysqli($db_config["server"], $db_config["username"], $db_config["password"], $db_config["database"]);
+        }
+        return self::$db_instance;
+    }
+
+     /**
      * Проверка ключа клиента сервиса
      * @return boolean
      */
     private function is_valid_key() {
         $sql = "SELECT * FROM `service_clients` WHERE `key` = " . $this->router->getParam(0) . "";
-        $res = mysql_query($sql);
-        if ($row = mysql_fetch_array($res, MYSQL_ASSOC)) {
+        $res = $this->db->query($sql);
+        if ($row = $res->fetch_array(MYSQL_ASSOC)) {
             $this->system_key_id = $row['_id'];
         }
         return $this->system_key_id > 0;
@@ -95,7 +102,7 @@ class Service {
 
         header('Content-type: application/json');
 
-        mysql_query("SET NAMES utf8");
+        $this->db->query("SET NAMES utf8");
 
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'POST':

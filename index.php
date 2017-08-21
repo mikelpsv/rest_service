@@ -2,7 +2,6 @@
 
 require_once 'config.php';
 require_once 'classes/Router.php';
-require_once 'classes/Database.php';
 require_once 'classes/Service.php';
 require_once 'classes/Handler.php';
 

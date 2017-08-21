@@ -1,7 +1,7 @@
 <?php
 // Подключение обработчиков
-//require_once 'handlers/MobileHandler.php';
-//require_once 'handlers/ErpMapXHandler.php';
+require_once 'handlers/MobileHandler.php';
+require_once 'handlers/ErpMapXHandler.php';
 
 define('BASE_DIR', 'base_dir');
 
