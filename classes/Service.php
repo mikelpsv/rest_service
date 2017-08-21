@@ -107,52 +107,6 @@ class Service {
         }
     }
 
-    private function _post() {
-        $rawData = file_get_contents("php://input");
-
-        $uri_tracking = "/tracking\/upload/i";
-        $uri_routes = "/routes\/upload/i";
-        $uri_message = "/messages\/upload/i";
-        $uri_img = "/img\/upload/i";
-        $uri_pointlocation = "/pointlocation\/upload/i";
-        $uri_travel_totals = "/travel_totals\/upload/i";
-        $uri_remains = "/remains\/upload/i";
-        $uri_delivery = "/delivery\/upload/i";
-        $uri_nexttravel = "/nexttravel\/upload/i";
-
-
-        Service::log(0, $this->uri);
-
-        if (preg_match($uri_tracking, $this->uri) == 1) {
-            postTracking($rawData);
-        } elseif (preg_match($uri_routes, $this->uri) == 1) {
-            postRoutes($rawData);
-        } elseif (preg_match($uri_travel_totals, $this->uri) == 1) {
-            @postTravelTotals($rawData);
-        } elseif (preg_match($uri_message, $this->uri) == 1) {
-            postMessage($rawData);
-        } elseif (preg_match($uri_img, $this->uri) == 1) {
-            postImg($rawData);
-        } elseif (preg_match($uri_pointlocation, $this->uri) == 1) {
-            postPointlocation($rawData);
-        } elseif (preg_match($uri_remains, $this->uri) == 1) {
-            postRemains($rawData);
-        } elseif (preg_match($uri_delivery, $this->uri) == 1) {
-            postDelivery($rawData);
-        } elseif (preg_match($uri_nexttravel, $this->uri) == 1) {
-            postNexttravel($rawData);
-        } elseif (_postRouterERP($this->uri, $rawData)) { // добавлено: post обработчики ERP
-            // ничего здесь не делаем
-        } else {
-            $resp = array(
-                'response' => false,
-                'message' => 'Endpoint not found',
-                'data' => array()
-            );
-
-            die(json_encode($resp));
-        }
-    }
 
 }
 
